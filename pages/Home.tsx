@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Sparkles } from 'lucide-react';
+import { Search, Sparkles, ArrowRight } from 'lucide-react';
 import { mockFirestore } from '../services/mockFirebase';
 import { extractFiltersFromQuery } from '../services/geminiService';
 import { Listing, FilterState } from '../types';
@@ -131,6 +131,17 @@ export const Home: React.FC = () => {
           {featuredListings.map(listing => (
             <ListingCard key={listing.id} listing={listing} />
           ))}
+        </div>
+
+        {/* View More Button */}
+        <div className="mt-12 flex justify-center">
+          <Link 
+            to="/explore" 
+            className="inline-flex items-center px-8 py-4 border border-brand-200 dark:border-brand-700 text-lg font-bold rounded-xl text-brand-700 dark:text-brand-300 bg-white dark:bg-gray-800 hover:bg-brand-50 dark:hover:bg-brand-900/40 hover:border-brand-300 shadow-sm hover:shadow-md transition-all group"
+          >
+            View More Listings
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       </div>
     </div>
