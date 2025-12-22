@@ -148,3 +148,17 @@ export const getNeighborhoodInsights = async (address: string, topic: string): P
     };
   }
 };
+
+// Feature 5: Generate Welcome Message for New Signups
+export const generateWelcomeMessage = async (userName: string): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `Generate a short, warm, and professional welcome message (max 2 sentences) for a new user named "${userName}" joining "Hearth & Home", an AI-powered real estate platform. Offer to help them find their dream home or answer questions about the market.`,
+    });
+    return response.text || `Welcome to Hearth & Home, ${userName}! I'm here to help you find your perfect property.`;
+  } catch (error) {
+    console.error("Gemini Welcome Message Error:", error);
+    return `Welcome to Hearth & Home, ${userName}! Let me know how I can help you today.`;
+  }
+};

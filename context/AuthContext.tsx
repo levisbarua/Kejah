@@ -4,10 +4,13 @@ import { mockAuth } from '../services/mockFirebase';
 
 interface AuthContextType {
   user: User | null;
-  signIn: () => Promise<void>;
+  signIn: (email?: string, password?: string) => Promise<void>;
+  signUp: (name: string, email?: string, password?: string) => Promise<void>;
   signOut: () => Promise<void>;
   verifyPhone: (phoneNumber: string) => Promise<void>;
   loading: boolean;
+  isNewSignup: boolean;
+  clearNewSignupParams: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,6 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isNewSignup, setIsNewSignup] = useState(false);
 
   useEffect(() => {
     // Simulate initial auth check
@@ -26,10 +30,21 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     initAuth();
   }, []);
 
-  const signIn = async () => {
+  const signIn = async (email?: string, password?: string) => {
     try {
-      const u = await mockAuth.login();
+      const u = await mockAuth.login(email, password);
       setUser(u);
+      setIsNewSignup(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const signUp = async (name: string, email?: string, password?: string) => {
+    try {
+      const u = await mockAuth.signUp(name, email, password);
+      setUser(u);
+      setIsNewSignup(true);
     } catch (e) {
       console.error(e);
     }
@@ -38,6 +53,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   const signOut = async () => {
     await mockAuth.logout();
     setUser(null);
+    setIsNewSignup(false);
   };
 
   const verifyPhone = async (phoneNumber: string) => {
@@ -50,8 +66,10 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     }
   };
 
+  const clearNewSignupParams = () => setIsNewSignup(false);
+
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut, verifyPhone, loading }}>
+    <AuthContext.Provider value={{ user, signIn, signUp, signOut, verifyPhone, loading, isNewSignup, clearNewSignupParams }}>
       {children}
     </AuthContext.Provider>
   );

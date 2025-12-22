@@ -186,9 +186,19 @@ const MOCK_LISTINGS: Listing[] = [
 
 export const mockAuth = {
   currentUser: null as User | null,
-  login: async () => {
+  login: async (email?: string, password?: string) => {
+    // Mock login ignores credentials but signatures are updated for the modal
     mockAuth.currentUser = MOCK_USER;
     return MOCK_USER;
+  },
+  signUp: async (name: string, email?: string, password?: string) => {
+    mockAuth.currentUser = { 
+      ...MOCK_USER, 
+      displayName: name, 
+      email: email || MOCK_USER.email,
+      uid: 'user_' + Date.now() 
+    };
+    return mockAuth.currentUser;
   },
   logout: async () => {
     mockAuth.currentUser = null;
@@ -207,6 +217,9 @@ export const mockFirestore = {
   getUserById: async (uid: string): Promise<User | null> => {
     await new Promise(resolve => setTimeout(resolve, 200));
     if (uid === MOCK_USER.uid) return MOCK_USER;
+    // Return current mock user if IDs match (supports dynamic signup ID)
+    if (mockAuth.currentUser && uid === mockAuth.currentUser.uid) return mockAuth.currentUser;
+
     return {
       uid,
       email: 'agent@hearth.com',
@@ -220,7 +233,7 @@ export const mockFirestore = {
 
   getAgents: async (): Promise<User[]> => {
     await new Promise(resolve => setTimeout(resolve, 600));
-    return [
+    const agents: User[] = [
       {
         uid: 'agent_1',
         email: 'sarah.realtor@hearth.com',
@@ -256,9 +269,14 @@ export const mockFirestore = {
         photoURL: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400',
         isVerified: false,
         phoneNumber: '(555) 222-3333'
-      },
-      MOCK_USER // Include the logged in demo user too
+      }
     ];
+    if (mockAuth.currentUser) {
+        agents.push(mockAuth.currentUser);
+    } else {
+        agents.push(MOCK_USER);
+    }
+    return agents;
   },
   
   getListings: async (filters: any) => {

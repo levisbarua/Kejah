@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Sparkles, ExternalLink, Search } from 'lucide-react';
-import { sendChatMessage } from '../services/geminiService';
+import { sendChatMessage, generateWelcomeMessage } from '../services/geminiService';
+import { useAuth } from '../context/AuthContext';
 
 export const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,6 +9,8 @@ export const ChatBot: React.FC = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const { user, isNewSignup, clearNewSignupParams } = useAuth();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -16,6 +19,24 @@ export const ChatBot: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isOpen]);
+
+  // Handle Automatic Welcome for New Signups
+  useEffect(() => {
+    if (user && isNewSignup) {
+      const initWelcome = async () => {
+        setIsOpen(true);
+        setLoading(true);
+        // Add a small delay to make it feel natural after "signup success"
+        await new Promise(r => setTimeout(r, 800));
+        
+        const welcomeText = await generateWelcomeMessage(user.displayName);
+        setMessages(prev => [...prev, { role: 'model', text: welcomeText }]);
+        setLoading(false);
+        clearNewSignupParams(); // Reset flag so it doesn't trigger again on refresh/re-render
+      };
+      initWelcome();
+    }
+  }, [user, isNewSignup, clearNewSignupParams]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
