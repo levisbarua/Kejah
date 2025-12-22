@@ -31,6 +31,9 @@ export const ListingDetails: React.FC = () => {
 
   // Favorite State
   const [isSaved, setIsSaved] = useState(false);
+  
+  // Share Feedback State
+  const [isCopied, setIsCopied] = useState(false);
 
   // Trust & Safety State
   const [showSafetyModal, setShowSafetyModal] = useState(false);
@@ -113,6 +116,35 @@ export const ListingDetails: React.FC = () => {
     }
 
     localStorage.setItem('hearth_saved_listings', JSON.stringify(newSavedListings));
+  };
+
+  const handleShare = async () => {
+    if (!listing) return;
+    
+    const shareData = {
+      title: listing.title,
+      text: `Check out ${listing.title} on Hearth & Home`,
+      url: window.location.href,
+    };
+
+    // Use Web Share API if available
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.debug('Share cancelled');
+      }
+    } else {
+      // Fallback to clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy link', err);
+        alert('Failed to copy link. Please manually copy the URL.');
+      }
+    }
   };
 
   const handleReportSubmit = async (reason: string, details: string) => {
@@ -323,8 +355,21 @@ export const ListingDetails: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                     <button className="p-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" title="Share">
-                        <Share2 className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                     <button 
+                       onClick={handleShare}
+                       className={`p-2 rounded-full border transition-all duration-200 relative group ${
+                         isCopied 
+                           ? 'bg-green-50 border-green-200 text-green-600 dark:bg-green-900/30 dark:border-green-800 dark:text-green-400' 
+                           : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300'
+                       }`}
+                       title={isCopied ? "Copied!" : "Share"}
+                     >
+                        {isCopied ? <Check className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
+                        {isCopied && (
+                          <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg whitespace-nowrap z-50 animate-in fade-in zoom-in duration-200">
+                            Link Copied!
+                          </span>
+                        )}
                      </button>
                      <button 
                         onClick={toggleSave}
