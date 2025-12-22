@@ -12,6 +12,8 @@ import { About } from './pages/About';
 import { Agents } from './pages/Agents';
 import { Feedback } from './pages/Feedback';
 import { ContactUs } from './pages/ContactUs';
+import { Privacy } from './pages/Privacy';
+import { Terms } from './pages/Terms';
 import { ChatBot } from './components/ChatBot';
 
 const Layout = () => {
@@ -91,12 +93,12 @@ const Layout = () => {
           </div>
           
           <div className="pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium text-center md:text-left">
               © 2024 Hearth & Home. Built with React & Gemini.
             </p>
-            <div className="flex gap-6 text-xs text-gray-600 dark:text-gray-400">
-               <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer font-medium transition-colors">Privacy Policy</span>
-               <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer font-medium transition-colors">Terms of Service</span>
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-xs text-gray-600 dark:text-gray-400">
+               <Link to="/privacy" className="hover:text-gray-900 dark:hover:text-white cursor-pointer font-medium transition-colors">Privacy Policy</Link>
+               <Link to="/terms" className="hover:text-gray-900 dark:hover:text-white cursor-pointer font-medium transition-colors">Terms of Service</Link>
             </div>
           </div>
         </div>
@@ -121,6 +123,8 @@ const App = () => {
               <Route path="about" element={<About />} />
               <Route path="feedback" element={<Feedback />} />
               <Route path="contact" element={<ContactUs />} />
+              <Route path="privacy" element={<Privacy />} />
+              <Route path="terms" element={<Terms />} />
             </Route>
           </Routes>
         </HashRouter>
