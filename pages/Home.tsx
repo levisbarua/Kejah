@@ -47,8 +47,8 @@ export const Home: React.FC = () => {
         <div className="absolute inset-0">
           <img
             className="w-full h-full object-cover opacity-30"
-            src="https://images.unsplash.com/photo-1600596542815-e495e6562839?auto=format&fit=crop&q=80&w=2000"
-            alt="Real estate background"
+            src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=2000"
+            alt="Luxury home exterior with garden"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-900 to-brand-800 opacity-90 mix-blend-multiply"></div>
         </div>
