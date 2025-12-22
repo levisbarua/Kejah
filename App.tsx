@@ -91,12 +91,12 @@ const Layout = () => {
           </div>
           
           <div className="pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-400 dark:text-gray-500">
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
               © 2024 Hearth & Home. Built with React & Gemini.
             </p>
-            <div className="flex gap-4 text-xs text-gray-400 dark:text-gray-500">
-               <span className="hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">Privacy Policy</span>
-               <span className="hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">Terms of Service</span>
+            <div className="flex gap-6 text-xs text-gray-600 dark:text-gray-400">
+               <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer font-medium transition-colors">Privacy Policy</span>
+               <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer font-medium transition-colors">Terms of Service</span>
             </div>
           </div>
         </div>
