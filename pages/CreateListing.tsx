@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import * as ReactRouterDOM from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { mockFirestore } from '../services/mockFirebase';
 import { useStorage } from '../hooks/useStorage';
 import { generateListingDescription } from '../services/geminiService';
 import { ListingType } from '../types';
 import { Wand2, UploadCloud, Loader2, Smartphone, ShieldCheck, CreditCard, CheckCircle, Lock, Crown } from 'lucide-react';
-
-const { useNavigate } = ReactRouterDOM;
 
 const KENYAN_CITIES = [
   "Bungoma", "Busia", "Eldoret", "Embu", "Garissa", "Homa Bay", "Isiolo", "Kajiado", 

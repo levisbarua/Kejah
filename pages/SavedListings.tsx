@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import * as ReactRouterDOM from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { mockFirestore } from '../services/mockFirebase';
 import { Listing } from '../types';
 import { ListingCard } from '../components/ListingCard';
 import { Heart, Search } from 'lucide-react';
-
-const { Link } = ReactRouterDOM;
 
 export const SavedListings: React.FC = () => {
   const [savedListings, setSavedListings] = useState<Listing[]>([]);

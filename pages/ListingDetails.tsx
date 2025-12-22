@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import * as ReactRouterDOM from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { mockFirestore } from '../services/mockFirebase';
 import { getNeighborhoodInsights, NeighborhoodInsight } from '../services/geminiService';
 import { Listing, ListingType, User } from '../types';
@@ -9,8 +9,6 @@ import { useTheme } from '../context/ThemeContext';
 import { SafetyModal } from '../components/SafetyModal';
 import { ReportModal } from '../components/ReportModal';
 import { WhatsAppButton } from '../components/WhatsAppButton';
-
-const { useParams, Link } = ReactRouterDOM;
 
 export const ListingDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();

@@ -1,23 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import * as ReactRouterDOM from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Sparkles } from 'lucide-react';
 import { mockFirestore } from '../services/mockFirebase';
 import { extractFiltersFromQuery } from '../services/geminiService';
 import { Listing, FilterState } from '../types';
 import { ListingCard } from '../components/ListingCard';
 
-const { Link, useNavigate } = ReactRouterDOM;
+// Array of high-quality real estate images for the slideshow
+const HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=2000",
+  "https://images.unsplash.com/photo-1600596542815-e32c630bd1ba?auto=format&fit=crop&q=80&w=2000",
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2000",
+  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=2000",
+  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=2000"
+];
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [featuredListings, setFeaturedListings] = useState<Listing[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAiSearching, setIsAiSearching] = useState(false);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
 
   useEffect(() => {
     mockFirestore.getListings({}).then(listings => {
       setFeaturedListings(listings.slice(0, 3));
     });
+
+    // Set up interval to rotate images every 2 seconds
+    const interval = setInterval(() => {
+      setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleAiSearch = async (e: React.FormEvent) => {
@@ -45,11 +60,16 @@ export const Home: React.FC = () => {
       {/* Hero Section */}
       <div className="relative bg-brand-900 overflow-hidden">
         <div className="absolute inset-0">
-          <img
-            className="w-full h-full object-cover opacity-30"
-            src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=2000"
-            alt="Luxury home exterior with garden"
-          />
+          {HERO_IMAGES.map((img, index) => (
+            <img
+              key={img}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                index === currentHeroIndex ? 'opacity-30' : 'opacity-0'
+              }`}
+              src={img}
+              alt={`Real estate background ${index + 1}`}
+            />
+          ))}
           <div className="absolute inset-0 bg-gradient-to-r from-brand-900 to-brand-800 opacity-90 mix-blend-multiply"></div>
         </div>
         <div className="relative max-w-7xl mx-auto py-16 px-4 sm:py-32 sm:px-6 lg:px-8 flex flex-col items-center text-center">

@@ -1,8 +1,6 @@
 import React from 'react';
-import * as ReactRouterDOM from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Sparkles, Shield, Users, Search, Brain, Map } from 'lucide-react';
-
-const { Link } = ReactRouterDOM;
 
 export const About: React.FC = () => {
   return (

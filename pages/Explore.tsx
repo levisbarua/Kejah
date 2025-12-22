@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import * as ReactRouterDOM from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { mockFirestore } from '../services/mockFirebase';
 import { Listing, ListingType } from '../types';
 import { ListingCard } from '../components/ListingCard';
 import { Filter, X, Search, ChevronDown, ChevronUp } from 'lucide-react';
-
-const { useSearchParams } = ReactRouterDOM;
 
 const KENYAN_CITIES = [
   "Bungoma", "Busia", "Eldoret", "Embu", "Garissa", "Homa Bay", "Isiolo", "Kajiado", 

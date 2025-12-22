@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Listing, ListingType, User } from '../types';
 import { mockFirestore } from '../services/mockFirebase';
 import { MapPin, Bed, Bath, Expand, Heart, ShieldCheck } from 'lucide-react';
-import * as ReactRouterDOM from 'react-router-dom';
-
-const { Link } = ReactRouterDOM;
+import { Link } from 'react-router-dom';
 
 interface ListingCardProps {
   listing: Listing;
