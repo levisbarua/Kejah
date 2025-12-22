@@ -9,6 +9,7 @@ import { useTheme } from '../context/ThemeContext';
 import { SafetyModal } from '../components/SafetyModal';
 import { ReportModal } from '../components/ReportModal';
 import { WhatsAppButton } from '../components/WhatsAppButton';
+import { ScheduleTourModal } from '../components/ScheduleTourModal';
 
 export const ListingDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +47,9 @@ export const ListingDetails: React.FC = () => {
   });
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
+
+  // Schedule Tour State
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -178,6 +182,15 @@ export const ListingDetails: React.FC = () => {
     setIsSent(true);
   };
 
+  const handleScheduleSubmit = async (data: any) => {
+    await mockFirestore.submitContactMessage({
+      name: data.name,
+      email: data.email,
+      subject: `Tour Request: ${data.tourType} on ${data.date}`,
+      message: `Phone: ${data.phone}. Requesting ${data.tourType} tour on ${data.date} at ${data.time}.`
+    });
+  };
+
   const nextImage = () => {
     if (!listing) return;
     setCurrentImageIndex((prev) => (prev === listing.imageUrls.length - 1 ? 0 : prev + 1));
@@ -217,6 +230,13 @@ export const ListingDetails: React.FC = () => {
         isOpen={showReportModal} 
         onClose={() => setShowReportModal(false)} 
         onSubmit={handleReportSubmit} 
+      />
+
+      <ScheduleTourModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        propertyTitle={listing.title}
+        onSubmit={handleScheduleSubmit}
       />
 
       {/* Navigation Header */}
@@ -575,7 +595,10 @@ export const ListingDetails: React.FC = () => {
                              />
                           )}
 
-                          <button className="w-full bg-white dark:bg-gray-700 text-brand-600 dark:text-brand-400 font-bold py-3 px-4 rounded-xl border-2 border-brand-100 dark:border-brand-900 hover:border-brand-600 dark:hover:border-brand-500 transition-colors">
+                          <button 
+                              onClick={() => setShowScheduleModal(true)}
+                              className="w-full bg-white dark:bg-gray-700 text-brand-600 dark:text-brand-400 font-bold py-3 px-4 rounded-xl border-2 border-brand-100 dark:border-brand-900 hover:border-brand-600 dark:hover:border-brand-500 transition-colors"
+                          >
                               Schedule Tour
                           </button>
                       </div>
