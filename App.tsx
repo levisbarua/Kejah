@@ -1,5 +1,5 @@
 import React from 'react';
-import * as ReactRouterDOM from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Outlet, Link } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
@@ -9,11 +9,10 @@ import { CreateListing } from './pages/CreateListing';
 import { ListingDetails } from './pages/ListingDetails';
 import { SavedListings } from './pages/SavedListings';
 import { About } from './pages/About';
+import { Agents } from './pages/Agents';
 import { Feedback } from './pages/Feedback';
 import { ContactUs } from './pages/ContactUs';
 import { ChatBot } from './components/ChatBot';
-
-const { HashRouter: Router, Routes, Route, Outlet, Link } = ReactRouterDOM;
 
 const Layout = () => {
   return (
@@ -50,6 +49,7 @@ const App = () => {
               <Route index element={<Home />} />
               <Route path="explore" element={<Explore />} />
               <Route path="saved" element={<SavedListings />} />
+              <Route path="agents" element={<Agents />} />
               <Route path="create" element={<CreateListing />} />
               <Route path="listing/:id" element={<ListingDetails />} />
               <Route path="about" element={<About />} />

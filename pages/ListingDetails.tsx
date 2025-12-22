@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
 import { mockFirestore } from '../services/mockFirebase';
 import { getNeighborhoodInsights, NeighborhoodInsight } from '../services/geminiService';
-import { Listing, ListingType } from '../types';
-import { MapPin, Bed, Bath, Expand, ArrowLeft, Check, Share2, Heart, Send, X, ChevronLeft, ChevronRight, Map, ExternalLink, ShieldCheck, Flag, AlertTriangle } from 'lucide-react';
+import { Listing, ListingType, User } from '../types';
+import { MapPin, Bed, Bath, Expand, ArrowLeft, Check, Share2, Heart, Send, X, ChevronLeft, ChevronRight, Map, ExternalLink, ShieldCheck, Flag, AlertTriangle, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { SafetyModal } from '../components/SafetyModal';
 import { ReportModal } from '../components/ReportModal';
+import { WhatsAppButton } from '../components/WhatsAppButton';
 
 const { useParams, Link } = ReactRouterDOM;
 
@@ -16,6 +17,7 @@ export const ListingDetails: React.FC = () => {
   const { user } = useAuth();
   const { theme } = useTheme();
   const [listing, setListing] = useState<Listing | null>(null);
+  const [listingAgent, setListingAgent] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Carousel State
@@ -49,16 +51,22 @@ export const ListingDetails: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      mockFirestore.getListingById(id).then(data => {
+      // Fetch Listing Details
+      mockFirestore.getListingById(id).then(async (data) => {
         setListing(data);
-        setLoading(false);
-        // Pre-fill default message if data exists
         if (data) {
            setContactForm(prev => ({ ...prev, message: `Hi, I am interested in ${data.title}. Is it still available?` }));
-           // Set initial map query to the exact location
            setMapQuery(`${data.location.lat},${data.location.lng}`);
+           
+           // Fetch Agent Details
+           const agent = await mockFirestore.getUserById(data.creatorId);
+           setListingAgent(agent);
         }
+        setLoading(false);
       });
+
+      // ANALYTICS: Increment View Counter
+      mockFirestore.incrementListingViews(id);
       
       // Check if saved in localStorage
       const savedListings = JSON.parse(localStorage.getItem('hearth_saved_listings') || '[]');
@@ -284,9 +292,16 @@ export const ListingDetails: React.FC = () => {
               <div className="flex justify-between items-start">
                   <div>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">{listing.title}</h1>
-                    <div className="flex items-center text-gray-500 dark:text-gray-400 mt-2 text-lg">
-                        <MapPin className="h-5 w-5 mr-2" />
-                        {listing.location.address}, {listing.location.city}, {listing.location.state}
+                    <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400 mt-2 text-lg">
+                        <div className="flex items-center">
+                          <MapPin className="h-5 w-5 mr-1" />
+                          {listing.location.address}, {listing.location.city}, {listing.location.state}
+                        </div>
+                        {/* View Counter Display */}
+                        <div className="flex items-center gap-1 text-sm bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+                           <Eye className="h-3 w-3" />
+                           {(listing.views || 0).toLocaleString()} views
+                        </div>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -450,7 +465,7 @@ export const ListingDetails: React.FC = () => {
                         {listing.type === ListingType.SALE ? 'For Sale' : 'For Rent'}
                     </span>
                     <div className="flex items-baseline">
-                        <span className="text-4xl font-bold text-gray-900 dark:text-white">${listing.price.toLocaleString()}</span>
+                        <span className="text-4xl font-bold text-gray-900 dark:text-white">Ksh {listing.price.toLocaleString()}</span>
                         {listing.type === ListingType.RENT && <span className="text-gray-500 dark:text-gray-400 ml-2">/month</span>}
                     </div>
                 </div>
@@ -553,6 +568,15 @@ export const ListingDetails: React.FC = () => {
                           >
                               Contact Agent
                           </button>
+                          
+                          {/* WhatsApp Button Integration */}
+                          {listingAgent && listingAgent.phoneNumber && (
+                             <WhatsAppButton 
+                               phoneNumber={listingAgent.phoneNumber} 
+                               propertyTitle={listing.title} 
+                             />
+                          )}
+
                           <button className="w-full bg-white dark:bg-gray-700 text-brand-600 dark:text-brand-400 font-bold py-3 px-4 rounded-xl border-2 border-brand-100 dark:border-brand-900 hover:border-brand-600 dark:hover:border-brand-500 transition-colors">
                               Schedule Tour
                           </button>
@@ -564,7 +588,7 @@ export const ListingDetails: React.FC = () => {
                     <p className="flex items-center justify-between mb-2">
                         <span>Listed by</span>
                         <span className="font-medium text-gray-900 dark:text-white flex items-center">
-                          Demo Agent
+                          {listingAgent ? listingAgent.displayName : 'Loading...'}
                           {/* We assume the demo agent is verified for this UI display as per mock data */}
                           <span title="Verified Agent" className="flex items-center ml-1">
                              <ShieldCheck className="h-4 w-4 text-blue-500" />
@@ -580,9 +604,13 @@ export const ListingDetails: React.FC = () => {
                     <button 
                       onClick={() => setShowReportModal(true)}
                       disabled={hasReported}
-                      className="mt-6 w-full flex items-center justify-center gap-2 text-xs text-gray-400 hover:text-red-500 transition-colors disabled:text-gray-300"
+                      className={`mt-6 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border transition-all duration-200 font-medium text-sm ${
+                        hasReported 
+                          ? 'bg-gray-100 text-gray-400 border-transparent cursor-not-allowed' 
+                          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:border-red-800 dark:hover:text-red-400 shadow-sm'
+                      }`}
                     >
-                      <Flag className="h-3 w-3" />
+                      <Flag className="h-4 w-4" />
                       {hasReported ? "Report Received" : "Report this listing"}
                     </button>
                 </div>

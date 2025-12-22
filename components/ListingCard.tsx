@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Listing, ListingType } from '../types';
-import { MapPin, Bed, Bath, Expand, Heart } from 'lucide-react';
+import { Listing, ListingType, User } from '../types';
+import { mockFirestore } from '../services/mockFirebase';
+import { MapPin, Bed, Bath, Expand, Heart, ShieldCheck } from 'lucide-react';
 import * as ReactRouterDOM from 'react-router-dom';
 
 const { Link } = ReactRouterDOM;
@@ -13,11 +14,18 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [agent, setAgent] = useState<User | null>(null);
 
   useEffect(() => {
     // Check if saved in localStorage on mount
     const savedListings = JSON.parse(localStorage.getItem('hearth_saved_listings') || '[]');
     setIsSaved(savedListings.includes(listing.id));
+
+    // Fetch Agent Details
+    let isMounted = true;
+    mockFirestore.getUserById(listing.creatorId).then(fetchedAgent => {
+       if (isMounted) setAgent(fetchedAgent);
+    });
 
     let interval: any;
     if (isHovered && listing.imageUrls.length > 1) {
@@ -27,8 +35,11 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
     } else {
       setCurrentImageIndex(0);
     }
-    return () => clearInterval(interval);
-  }, [isHovered, listing.imageUrls.length, listing.id]);
+    return () => {
+      clearInterval(interval);
+      isMounted = false;
+    };
+  }, [isHovered, listing.imageUrls.length, listing.id, listing.creatorId]);
 
   const toggleSave = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to the details page
@@ -101,15 +112,34 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
           <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-1">{listing.title}</h3>
         </div>
         
-        <p className="text-2xl font-bold text-brand-600 dark:text-brand-500 mb-4">
-          ${listing.price.toLocaleString()}
+        <p className="text-2xl font-bold text-brand-600 dark:text-brand-500 mb-2">
+          Ksh {listing.price.toLocaleString()}
           {listing.type === ListingType.RENT && <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">/mo</span>}
         </p>
 
-        <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mb-4">
+        <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mb-3">
           <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
           <span className="truncate">{listing.location.city}, {listing.location.state}</span>
         </div>
+
+        {/* Agent Info */}
+        {agent && (
+          <div className="flex items-center gap-2 mb-4 mt-1">
+             <img 
+               src={agent.photoURL || `https://ui-avatars.com/api/?name=${agent.displayName}&background=random`} 
+               alt={agent.displayName}
+               className="w-5 h-5 rounded-full object-cover border border-gray-100 dark:border-gray-600"
+             />
+             <div className="flex items-center gap-1 min-w-0">
+               <span className="text-xs text-gray-600 dark:text-gray-300 font-medium truncate">
+                 {agent.displayName}
+               </span>
+               {agent.isVerified && (
+                 <ShieldCheck className="w-3 h-3 text-brand-500 fill-brand-100 dark:fill-brand-900" aria-label="Verified Agent" />
+               )}
+             </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-2 border-t border-gray-100 dark:border-gray-700 pt-4 mt-auto">
           <div className="flex flex-col items-center justify-center text-gray-600 dark:text-gray-400">

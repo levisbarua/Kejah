@@ -43,10 +43,14 @@ export interface Listing {
   imageUrls: string[];
   location: GeoLocation;
   createdAt: number;
-  featured?: boolean;
+  featured?: boolean; // Equivalent to planType: 'premium'
+  views?: number; // Analytics: View Counter
   // Trust & Safety Fields
   status: 'active' | 'suspended';
   reportCount: number;
+  // Payment Fields
+  paymentStatus?: 'paid' | 'pending';
+  amountPaid?: number;
 }
 
 export interface FilterState {
@@ -54,6 +58,7 @@ export interface FilterState {
   minPrice?: number;
   maxPrice?: number;
   minBeds?: number;
+  bedrooms?: string; // Exact match or "4+"
   type?: ListingType;
 }
 

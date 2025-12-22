@@ -52,15 +52,15 @@ export const Home: React.FC = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-900 to-brand-800 opacity-90 mix-blend-multiply"></div>
         </div>
-        <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8 flex flex-col items-center text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+        <div className="relative max-w-7xl mx-auto py-16 px-4 sm:py-32 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
             Find your place, <span className="text-brand-300">faster.</span>
           </h1>
-          <p className="mt-6 text-xl text-brand-100 max-w-3xl">
+          <p className="mt-4 sm:mt-6 text-lg sm:text-xl text-brand-100 max-w-3xl">
             Experience the future of house hunting. Use our AI-powered search to describe exactly what you're looking for, or browse our curated listings.
           </p>
           
-          <div className="mt-10 max-w-2xl w-full">
+          <div className="mt-8 sm:mt-10 max-w-2xl w-full">
             <form onSubmit={handleAiSearch} className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-brand-400 to-blue-500 rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
               <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-2 gap-2 transition-colors">
@@ -71,7 +71,7 @@ export const Home: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="block w-full bg-transparent border-0 focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 px-4 py-3 text-base"
-                    placeholder="Describe your dream home... (e.g. 'Modern 2-bed in Miami')"
+                    placeholder="Describe your dream home... (e.g. 'Modern 2-bed in Nairobi')"
                   />
                 </div>
                 <button
@@ -96,8 +96,8 @@ export const Home: React.FC = () => {
       </div>
 
       {/* Featured Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex justify-between items-end mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
           <div>
             <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">Featured Listings</h2>
             <p className="mt-2 text-gray-500 dark:text-gray-400">Hand-picked properties just for you.</p>
