@@ -204,7 +204,7 @@ export const mockAuth = {
     mockAuth.currentUser = null;
   },
   verifyPhone: async (phoneNumber: string) => {
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate SMS Code
+    await new Promise(resolve => setTimeout(resolve, 400)); // Simulate SMS Code (Reduced from 1000)
     if (mockAuth.currentUser) {
       mockAuth.currentUser = { ...mockAuth.currentUser, phoneNumber };
       return mockAuth.currentUser;
@@ -215,7 +215,7 @@ export const mockAuth = {
 
 export const mockFirestore = {
   getUserById: async (uid: string): Promise<User | null> => {
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise(resolve => setTimeout(resolve, 50)); // Reduced from 200
     if (uid === MOCK_USER.uid) return MOCK_USER;
     // Return current mock user if IDs match (supports dynamic signup ID)
     if (mockAuth.currentUser && uid === mockAuth.currentUser.uid) return mockAuth.currentUser;
@@ -232,7 +232,7 @@ export const mockFirestore = {
   },
 
   getAgents: async (): Promise<User[]> => {
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(resolve => setTimeout(resolve, 150)); // Reduced from 600
     const agents: User[] = [
       {
         uid: 'agent_1',
@@ -280,7 +280,7 @@ export const mockFirestore = {
   },
   
   getListings: async (filters: any) => {
-    await new Promise(resolve => setTimeout(resolve, 600)); // Simulate network latency
+    await new Promise(resolve => setTimeout(resolve, 150)); // Reduced from 600
     // Filter out suspended listings for the feed
     let results = MOCK_LISTINGS.filter(l => l.status !== 'suspended');
 
@@ -328,7 +328,7 @@ export const mockFirestore = {
   },
   
   getListingById: async (id: string) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 100)); // Reduced from 500
     // Even if suspended, we might want to return it but handle UI differently, 
     // but for now, we'll return it as is.
     return MOCK_LISTINGS.find(l => l.id === id) || null;
@@ -345,7 +345,7 @@ export const mockFirestore = {
   },
 
   addListing: async (listing: Omit<Listing, 'id' | 'createdAt' | 'status' | 'reportCount' | 'views'>) => {
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 300)); // Reduced from 800
     const newListing: Listing = {
       ...listing,
       id: Math.random().toString(36).substr(2, 9),
@@ -359,7 +359,7 @@ export const mockFirestore = {
   },
 
   reportListing: async (listingId: string, reason: string) => {
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(resolve => setTimeout(resolve, 200)); // Reduced from 600
     const listingIndex = MOCK_LISTINGS.findIndex(l => l.id === listingId);
     
     if (listingIndex !== -1) {
@@ -376,13 +376,13 @@ export const mockFirestore = {
   },
 
   addFeedback: async (feedback: FeedbackData) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 300)); // Reduced from 1000
     console.log("Feedback submitted:", feedback);
     return { success: true };
   },
 
   submitContactMessage: async (data: any) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 300)); // Reduced from 1000
     console.log("Contact message submitted:", data);
     return { success: true };
   }
@@ -390,7 +390,7 @@ export const mockFirestore = {
 
 export const mockStorage = {
   uploadImage: async (file: File): Promise<string> => {
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate upload
+    await new Promise(resolve => setTimeout(resolve, 500)); // Reduced from 1500
     // Return a random image since we can't actually host user files
     const id = Math.floor(Math.random() * 100);
     return `https://picsum.photos/id/${id}/800/600`;

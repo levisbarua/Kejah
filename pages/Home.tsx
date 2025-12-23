@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Sparkles, ArrowRight } from 'lucide-react';
@@ -8,11 +7,11 @@ import { Listing } from '../types';
 import { ListingCard } from '../components/ListingCard';
 
 const HERO_IMAGES = [
-  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=2000",
-  "https://images.unsplash.com/photo-1600596542815-e32c630bd1ba?auto=format&fit=crop&q=80&w=2000",
-  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2000",
-  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=2000",
-  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=2000"
+  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=60&w=1600",
+  "https://images.unsplash.com/photo-1600596542815-e32c630bd1ba?auto=format&fit=crop&q=60&w=1600",
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=60&w=1600",
+  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=60&w=1600",
+  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=60&w=1600"
 ];
 
 export const Home: React.FC = () => {
@@ -64,6 +63,7 @@ export const Home: React.FC = () => {
               }`}
               src={img}
               alt={`Real estate background ${index + 1}`}
+              loading={index === 0 ? "eager" : "lazy"}
             />
           ))}
           <div className="absolute inset-0 bg-gradient-to-r from-brand-900 to-brand-800 opacity-90 mix-blend-multiply"></div>
