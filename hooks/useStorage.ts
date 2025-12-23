@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { mockStorage } from '../services/mockFirebase';
 
@@ -12,19 +13,19 @@ export const useStorage = () => {
     setUrl(null);
 
     try {
-      // Simulate progress events
+      // Simulate progress
+      let p = 0;
       const interval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 20, 90));
+        p += 20;
+        setProgress(p);
+        if (p >= 100) clearInterval(interval);
       }, 200);
 
       const downloadUrl = await mockStorage.uploadImage(file);
-      
-      clearInterval(interval);
-      setProgress(100);
       setUrl(downloadUrl);
       return downloadUrl;
-    } catch (err) {
-      setError('Upload failed');
+    } catch (err: any) {
+      setError(err.message || 'Upload failed');
       throw err;
     }
   };

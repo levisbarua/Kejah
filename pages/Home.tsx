@@ -1,12 +1,12 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Sparkles, ArrowRight } from 'lucide-react';
 import { mockFirestore } from '../services/mockFirebase';
 import { extractFiltersFromQuery } from '../services/geminiService';
-import { Listing, FilterState } from '../types';
+import { Listing } from '../types';
 import { ListingCard } from '../components/ListingCard';
 
-// Array of high-quality real estate images for the slideshow
 const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=2000",
   "https://images.unsplash.com/photo-1600596542815-e32c630bd1ba?auto=format&fit=crop&q=80&w=2000",
@@ -27,10 +27,9 @@ export const Home: React.FC = () => {
       setFeaturedListings(listings.slice(0, 3));
     });
 
-    // Set up interval to rotate images every 2 seconds
     const interval = setInterval(() => {
       setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 2000);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, []);
@@ -40,11 +39,9 @@ export const Home: React.FC = () => {
     if (!searchQuery.trim()) return;
 
     setIsAiSearching(true);
-    // Use Gemini to convert "Cheap 2 bed in Austin" -> Filters
     const filters = await extractFiltersFromQuery(searchQuery);
     setIsAiSearching(false);
 
-    // Serialize filters to URL search params
     const params = new URLSearchParams();
     if (filters.city) params.set('city', filters.city);
     if (filters.minPrice) params.set('minPrice', filters.minPrice.toString());
@@ -57,7 +54,6 @@ export const Home: React.FC = () => {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
-      {/* Hero Section */}
       <div className="relative bg-brand-900 overflow-hidden">
         <div className="absolute inset-0">
           {HERO_IMAGES.map((img, index) => (
@@ -99,31 +95,22 @@ export const Home: React.FC = () => {
                   disabled={isAiSearching}
                   className="inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors w-full sm:w-auto shadow-sm"
                 >
-                  {isAiSearching ? (
-                    <>
-                       <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"/>
-                       Thinking...
-                    </>
-                  ) : 'Search'}
+                  {isAiSearching ? 'Thinking...' : 'Search'}
                 </button>
               </div>
             </form>
-            <p className="mt-3 text-sm text-brand-100/80 flex items-center justify-center gap-1.5 font-medium">
-              <Sparkles className="h-4 w-4" /> Powered by Gemini
-            </p>
           </div>
         </div>
       </div>
 
-      {/* Featured Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
+        <div className="flex justify-between items-end mb-8">
           <div>
             <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">Featured Listings</h2>
             <p className="mt-2 text-gray-500 dark:text-gray-400">Hand-picked properties just for you.</p>
           </div>
-          <Link to="/explore" className="text-brand-600 font-medium hover:text-brand-700 dark:text-brand-500 dark:hover:text-brand-400 flex items-center">
-            View all listings <span aria-hidden="true" className="ml-1">&rarr;</span>
+          <Link to="/explore" className="text-brand-600 font-medium hover:text-brand-700 dark:text-brand-500 flex items-center">
+            View all <ArrowRight className="ml-1 h-4 w-4" />
           </Link>
         </div>
         
@@ -132,8 +119,7 @@ export const Home: React.FC = () => {
             <ListingCard key={listing.id} listing={listing} />
           ))}
         </div>
-
-        {/* View More Button */}
+        
         <div className="mt-12 flex justify-center">
           <Link 
             to="/explore" 

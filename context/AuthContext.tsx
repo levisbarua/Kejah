@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, PropsWithChildren } from 'react';
-import { User } from '../types';
-import { mockAuth } from '../services/mockFirebase';
+
+import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from 'react';
+import { mockAuth, mockFirestore } from '../services/mockFirebase';
+import { User, UserRole } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -22,32 +23,22 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     // Simulate initial auth check
-    const initAuth = async () => {
-      // In real Firebase: onAuthStateChanged
-      await new Promise(r => setTimeout(r, 500));
+    const checkAuth = async () => {
+      setUser(mockAuth.currentUser);
       setLoading(false);
     };
-    initAuth();
+    checkAuth();
   }, []);
 
   const signIn = async (email?: string, password?: string) => {
-    try {
-      const u = await mockAuth.login(email, password);
-      setUser(u);
-      setIsNewSignup(false);
-    } catch (e) {
-      console.error(e);
-    }
+    const loggedInUser = await mockAuth.login(email, password);
+    setUser(loggedInUser);
   };
 
   const signUp = async (name: string, email?: string, password?: string) => {
-    try {
-      const u = await mockAuth.signUp(name, email, password);
-      setUser(u);
-      setIsNewSignup(true);
-    } catch (e) {
-      console.error(e);
-    }
+    const newUser = await mockAuth.signUp(name, email, password);
+    setUser(newUser);
+    setIsNewSignup(true);
   };
 
   const signOut = async () => {
@@ -57,13 +48,8 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   };
 
   const verifyPhone = async (phoneNumber: string) => {
-    try {
-      const updatedUser = await mockAuth.verifyPhone(phoneNumber);
-      setUser(updatedUser);
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
+    const updatedUser = await mockAuth.verifyPhone(phoneNumber);
+    setUser(updatedUser);
   };
 
   const clearNewSignupParams = () => setIsNewSignup(false);
