@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter, Routes, Route, Outlet, Link } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -15,6 +16,7 @@ import { ContactUs } from './pages/ContactUs';
 import { Privacy } from './pages/Privacy';
 import { Terms } from './pages/Terms';
 import { ChatBot } from './components/ChatBot';
+import { LiveAssistant } from './components/LiveAssistant';
 
 const Layout = () => {
   return (
@@ -24,6 +26,7 @@ const Layout = () => {
         <Outlet />
       </main>
       <ChatBot />
+      <LiveAssistant />
       <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto transition-colors duration-200">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">

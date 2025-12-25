@@ -1,5 +1,7 @@
 
 import { useState } from 'react';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { storage, isFirebaseConfigured } from '../services/firebaseConfig';
 import { mockStorage } from '../services/mockFirebase';
 
 export const useStorage = () => {
@@ -7,27 +9,38 @@ export const useStorage = () => {
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState<string | null>(null);
 
-  const uploadFile = async (file: File) => {
+  const uploadFile = async (file: File): Promise<string> => {
+    if (!isFirebaseConfigured || !storage) {
+      const mockUrl = await mockStorage.uploadImage(file);
+      setUrl(mockUrl);
+      setProgress(100);
+      return mockUrl;
+    }
+
     setProgress(0);
     setError(null);
     setUrl(null);
 
-    try {
-      // Simulate progress
-      let p = 0;
-      const interval = setInterval(() => {
-        p += 20;
-        setProgress(p);
-        if (p >= 100) clearInterval(interval);
-      }, 200);
+    return new Promise<string>((resolve, reject) => {
+      const storageRef = ref(storage, `listings/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-      const downloadUrl = await mockStorage.uploadImage(file);
-      setUrl(downloadUrl);
-      return downloadUrl;
-    } catch (err: any) {
-      setError(err.message || 'Upload failed');
-      throw err;
-    }
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const p = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setProgress(p);
+        }, 
+        (err) => {
+          setError(err.message);
+          reject(err);
+        }, 
+        async () => {
+          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          setUrl(downloadUrl);
+          resolve(downloadUrl);
+        }
+      );
+    });
   };
 
   return { progress, error, url, uploadFile };

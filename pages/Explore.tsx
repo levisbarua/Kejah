@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { mockFirestore } from '../services/mockFirebase';
-import { Listing } from '../types';
+import { Listing, ListingType } from '../types';
 import { ListingCard } from '../components/ListingCard';
 import { Filter, X, Search } from 'lucide-react';
 
@@ -57,6 +57,7 @@ export const Explore: React.FC = () => {
               <Filter className="h-4 w-4 mr-2" /> Filters
             </h3>
             <form onSubmit={applyFilters} className="space-y-4">
+              {/* City Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">City</label>
                 <select
@@ -68,11 +69,64 @@ export const Explore: React.FC = () => {
                   {KENYAN_CITIES.map(city => <option key={city} value={city}>{city}</option>)}
                 </select>
               </div>
+
+              {/* Listing Type Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Listing Type</label>
+                <select
+                  value={filters.type}
+                  onChange={e => setFilters({...filters, type: e.target.value})}
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:ring-brand-500 sm:text-sm p-2 border bg-white dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="">Any Type</option>
+                  <option value={ListingType.SALE}>For Sale</option>
+                  <option value={ListingType.RENT}>For Rent</option>
+                </select>
+              </div>
+
+              {/* Bedrooms Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Bedrooms</label>
+                <select
+                  value={filters.bedrooms}
+                  onChange={e => setFilters({...filters, bedrooms: e.target.value})}
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:ring-brand-500 sm:text-sm p-2 border bg-white dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="">Any</option>
+                  <option value="0">Bedsitter (Studio)</option>
+                  <option value="1">1 Bedroom</option>
+                  <option value="2">2 Bedrooms</option>
+                  <option value="3">3 Bedrooms</option>
+                  <option value="4+">4+ Bedrooms</option>
+                </select>
+              </div>
+
+              {/* Price Range Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Price Range (Ksh)</label>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={filters.minPrice}
+                    onChange={e => setFilters({...filters, minPrice: e.target.value})}
+                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:ring-brand-500 sm:text-sm p-2 border bg-white dark:bg-gray-700 dark:text-white"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={filters.maxPrice}
+                    onChange={e => setFilters({...filters, maxPrice: e.target.value})}
+                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:ring-brand-500 sm:text-sm p-2 border bg-white dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 transition-colors"
               >
-                Apply
+                Apply Filters
               </button>
             </form>
           </div>
@@ -91,6 +145,7 @@ export const Explore: React.FC = () => {
             <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
               <Search className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No properties found</h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Try adjusting your filters.</p>
             </div>
           )}
         </div>

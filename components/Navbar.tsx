@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Home, Search, PlusCircle, LogIn, LogOut, User as UserIcon, Sun, Moon, Heart, Info, Menu, X, Users, UserPlus } from 'lucide-react';
+import { isFirebaseConfigured } from '../services/firebaseConfig';
+import { Home, Search, PlusCircle, LogIn, LogOut, User as UserIcon, Sun, Moon, Heart, Info, Menu, X, Users, UserPlus, Zap, Database } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 
 export const Navbar: React.FC = () => {
@@ -15,7 +17,6 @@ export const Navbar: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Standard link styles
   const linkClass = (path: string) => 
     `px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 transition-colors ${
       isActive(path)
@@ -47,18 +48,27 @@ export const Navbar: React.FC = () => {
       <nav className="fixed w-full top-0 z-50 transition-all duration-300 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            {/* Logo and Desktop Nav */}
             <div className="flex items-center">
               <Link to="/" className="flex-shrink-0 flex items-center gap-2 mr-6" onClick={() => setIsMobileMenuOpen(false)}>
                 <div className="bg-brand-600 p-1.5 rounded-lg">
                   <Home className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-700 to-brand-500 dark:from-white dark:to-gray-200 tracking-tight hidden sm:block">
-                  Hearth & Home
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-700 to-brand-500 dark:from-white dark:to-gray-200 tracking-tight hidden sm:block leading-none">
+                    Hearth & Home
+                  </span>
+                  {isFirebaseConfigured ? (
+                    <span className="text-[10px] font-bold text-brand-600 dark:text-brand-400 uppercase tracking-tighter flex items-center gap-0.5 mt-0.5">
+                      <Zap className="h-2 w-2 fill-current" /> Live Connection
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold text-orange-500 uppercase tracking-tighter flex items-center gap-0.5 mt-0.5">
+                      <Database className="h-2 w-2" /> Demo Mode
+                    </span>
+                  )}
+                </div>
               </Link>
               
-              {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-1">
                 <Link to="/explore" className={linkClass('/explore')}>
                   <Search className="h-4 w-4" />
@@ -85,7 +95,6 @@ export const Navbar: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Side Actions */}
             <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={toggleTheme}
@@ -128,7 +137,6 @@ export const Navbar: React.FC = () => {
                 </div>
               )}
 
-              {/* Mobile Menu Button */}
               <div className="flex md:hidden items-center">
                  <button
                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -147,7 +155,6 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">

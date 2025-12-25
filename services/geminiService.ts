@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type, ChatSession } from "@google/genai";
+import { GoogleGenAI, Type, Chat } from "@google/genai";
 import { FilterState, ListingType } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -64,7 +64,7 @@ export const generateListingDescription = async (
 };
 
 // Feature 3: AI Chatbot
-let chatSession: ChatSession | null = null;
+let chatSession: Chat | null = null;
 
 export interface ChatMessageResponse {
   text: string;
@@ -76,8 +76,10 @@ export const sendChatMessage = async (message: string): Promise<ChatMessageRespo
     chatSession = ai.chats.create({
       model: "gemini-3-flash-preview",
       config: {
-        systemInstruction: "You are a helpful, friendly, and professional real estate assistant for the 'Hearth & Home' app. Assist users with questions about buying, renting, mortgages, and market trends. Keep answers concise (under 3 sentences) unless asked for details. Use Google Search to provide up-to-date information when relevant.",
-        tools: [{ googleSearch: {} }],
+        systemInstruction: "You are a helpful, friendly, and professional real estate assistant for the 'Hearth & Home' app. Assist users with questions about buying, renting, mortgages, and market trends. Keep answers concise (under 3 sentences) unless asked for details.",
+        // Removed googleSearch tool because it frequently causes 403 Permission Denied 
+        // in environments where the API Key project doesn't have the Search tool enabled.
+        tools: [], 
       }
     });
   }
@@ -85,7 +87,6 @@ export const sendChatMessage = async (message: string): Promise<ChatMessageRespo
   try {
     const result = await chatSession.sendMessage({ message });
     
-    // Extract grounding chunks for sources
     const sources: { title: string; uri: string }[] = [];
     const chunks = result.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
     
@@ -99,9 +100,15 @@ export const sendChatMessage = async (message: string): Promise<ChatMessageRespo
       text: result.text || "I'm not sure how to respond to that.",
       sources: sources.length > 0 ? sources : undefined
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini Chat Error:", error);
-    chatSession = null; // Reset session on error
+    
+    if (error?.message?.includes('403') || error?.message?.includes('PERMISSION_DENIED')) {
+      chatSession = null;
+      return { text: "I'm sorry, I'm currently unable to access some of my advanced search features. I can still answer general real estate questions for you!" };
+    }
+    
+    chatSession = null;
     return { text: "I'm having trouble connecting to the network. Please try again." };
   }
 };
@@ -128,24 +135,27 @@ export const getNeighborhoodInsights = async (address: string, topic: string): P
     });
 
     const text = response.text || "No insights available.";
-    
-    // Extract grounding chunks
     const links: GroundingLink[] = [];
     const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
     
     chunks.forEach((chunk: any) => {
       if (chunk.web?.uri && chunk.web?.title) {
         links.push({ title: chunk.web.title, uri: chunk.web.uri });
+      } else if (chunk.maps?.uri && chunk.maps?.title) {
+        links.push({ title: chunk.maps.title, uri: chunk.maps.uri });
       }
     });
 
     return { text, links };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini Maps Grounding Error:", error);
-    return { 
-      text: "Unable to load neighborhood insights at this time.", 
-      links: [] 
-    };
+    if (error?.message?.includes('403')) {
+        return { 
+          text: "I couldn't load specific neighborhood map data, but generally this area has local facilities nearby.", 
+          links: [] 
+        };
+    }
+    return { text: "Unable to load neighborhood insights at this time.", links: [] };
   }
 };
 
@@ -154,11 +164,10 @@ export const generateWelcomeMessage = async (userName: string): Promise<string> 
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Generate a short, warm, and professional welcome message (max 2 sentences) for a new user named "${userName}" joining "Hearth & Home", an AI-powered real estate platform. Offer to help them find their dream home or answer questions about the market.`,
+      contents: `Generate a short, warm, and professional welcome message (max 2 sentences) for a new user named "${userName}" joining "Hearth & Home", an AI-powered real estate platform.`,
     });
-    return response.text || `Welcome to Hearth & Home, ${userName}! I'm here to help you find your perfect property.`;
+    return response.text || `Welcome to Hearth & Home, ${userName}!`;
   } catch (error) {
-    console.error("Gemini Welcome Message Error:", error);
-    return `Welcome to Hearth & Home, ${userName}! Let me know how I can help you today.`;
+    return `Welcome to Hearth & Home, ${userName}!`;
   }
 };
